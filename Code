@@ -1,0 +1,107 @@
+import random
+
+def generate_star_chart(size):
+    chart = {}
+    for i in range(size):
+        chart[f"Star {i+1}"] = {
+            "type": random.choice(["Anomaly", "Asteroid", "Signal", "Phenomenon", "Empty"]),
+            "resources": {"fuel": random.randint(-10, 20), "energy": random.randint(-15, 25), "data": random.randint(-5, 10)},
+            "description": f"Uncharted region {i+1}."
+        }
+    return chart
+
+def encounter_anomaly(resources):
+    print("A strange energy field surrounds you. Decipher the sequence: 2, 3, 5, 7, 11, ?")
+    guess = input("Enter the next prime number: ")
+    if guess == "13":
+        resources["data"] += 10
+        print("Correct! Data retrieved.")
+    else:
+        resources["energy"] -= 5
+        print("Incorrect. Energy drain.")
+    return resources
+
+def encounter_asteroid(resources):
+    print("Navigating an asteroid field. Choose a path: left or right?")
+    choice = input("Enter left or right: ").lower()
+    if random.random() < 0.5:
+        resources["fuel"] -= 8
+        print("Rough passage. Fuel lost.")
+    else:
+        resources["data"] += 3
+        print("Safe passage. Minor data gain.")
+    return resources
+
+def encounter_signal(resources):
+    encoded_message = "101 111 110 100 011 111 001 011 000"
+    print(f"Cryptic signal received: {encoded_message}")
+    decoded = input("Enter the decoded message (in decimal, separated by spaces): ")
+    if decoded == "5 7 6 4 3 7 1 3 0":
+        resources["data"] += 15
+        print("Message decoded! Valuable data obtained.")
+    else:
+        resources["energy"] -= 7
+        print("Incorrect decoding. Energy lost.")
+    return resources
+
+def encounter_phenomenon(resources):
+    if random.random() < 0.5:
+        resources["fuel"] += 12
+        print("Solar flare! Fuel cells recharged.")
+    else:
+        resources["energy"] -= 10
+        print("Cosmic storm! Energy systems damaged.")
+    return resources
+
+def celestial_cartographer():
+    star_chart = generate_star_chart(10)
+    resources = {"fuel": 50, "energy": 100, "data": 20}
+    current_location = "Home"
+    discovered = {"Home": True}
+
+    print("Welcome, Celestial Cartographer!")
+
+    while resources["fuel"] > 0 and resources["energy"] > 0:
+        print(f"\nLocation: {current_location}")
+        print(f"Resources: Fuel={resources['fuel']}, Energy={resources['energy']}, Data={resources['data']}")
+
+        print("Available Destinations:")
+        available_destinations = [loc for loc in star_chart if loc not in discovered]
+        if current_location != "Home":
+            available_destinations.append("Home")
+
+        for i, dest in enumerate(available_destinations):
+            print(f"{i+1}. {dest}")
+
+        choice = input("Enter destination number or 'quit': ")
+        if choice.lower() == "quit":
+            break
+
+        try:
+            destination = available_destinations[int(choice) - 1]
+        except (ValueError, IndexError):
+            print("Invalid choice.")
+            continue
+
+        resources["fuel"] -= 10
+        current_location = destination
+        discovered[destination] = True
+
+        print(f"\nArriving at {destination}...")
+
+        if star_chart[destination]["type"] == "Anomaly":
+            resources = encounter_anomaly(resources)
+        elif star_chart[destination]["type"] == "Asteroid":
+            resources = encounter_asteroid(resources)
+        elif star_chart[destination]["type"] == "Signal":
+            resources = encounter_signal(resources)
+        elif star_chart[destination]["type"] == "Phenomenon":
+            resources = encounter_phenomenon(resources)
+        else:
+            print("Empty space. Nothing to see here.")
+
+    print("\nGame Over!")
+    print(f"Final Resources: Fuel={resources['fuel']}, Energy={resources['energy']}, Data={resources['data']}")
+
+if __name__ == "__main__":
+    celestial_cartographer()
